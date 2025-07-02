@@ -1,25 +1,31 @@
-// lib/hygraph.ts
+import type { RichTextContent } from '@graphcms/rich-text-types'
 
 import { GraphQLClient, gql } from 'graphql-request';
+
+// Interface para a Categoria, pois ela agora possui um 'name' no Hygraph
+export interface ProductCategory {
+  name: string;
+}
 
 export interface Product {
   id: string;
   name: string;
-  price: number;
   imageUrl: string;
   description: string;
-  category: string;
+  // O campo 'category' agora é do tipo ProductCategory (ou seja, um objeto com 'name')
+  category: ProductCategory;
   // Novos campos para a página de detalhes
   coverImage?: string; // Imagem de capa, se for diferente da imageUrl
   technicalSpecs?: {
-    [key: string]: string; // Objeto para ficha técnica (ex: { "Peso": "2kg", "Dimensões": "10x10x5cm" })
+    raw: RichTextContent
   };
   affiliateLinks?: {
     name: string; // Nome da loja (ex: "Amazon", "Magazine Luiza")
     url: string; // URL do link de afiliado
   }[];
-  longDescription?: string; // Uma descrição mais longa para a página de detalhes
-
+  longDescription?: {
+    raw: RichTextContent
+  }; // Uma descrição mais longa para a página de detalhes
 }
 
 // Defina sua URL da API Hygraph a partir das variáveis de ambiente
@@ -41,58 +47,40 @@ const GET_PRODUCTS_QUERY = gql`
   query GetProducts(
     $first: Int = 12,
     $skip: Int = 0,
-    $category: String,
-    $searchTerm: String
+    # Remove as variáveis aqui, elas serão passadas no objeto 'where'
+    $where: ProductWhereInput # Define o tipo do filtro 'where'
   ) {
     products(
       first: $first,
       skip: $skip,
-      where: {
-        AND: [
-          { category_contains: $category } # Filtro por categoria (ajuste conforme seu schema)
-          { OR: [ # Filtro por termo de busca (ajuste conforme seu schema)
-              { name_contains: $searchTerm },
-              { description_contains: $searchTerm },
-              { longDescription_contains: $searchTerm }
-            ]
-          }
-        ]
-      }
+      where: $where # Usa a variável $where diretamente
       orderBy: createdAt_DESC # Exemplo de ordenação
     ) {
       id
       name
-      price
-      imageUrl { # Hygraph geralmente retorna Assets com URLs
+      imageUrl {
         url
       }
       description
-      category
-      # Campos para a página de detalhes (alguns podem não ser necessários aqui, mas para consistência)
+      category { # Busca o subcampo 'name' da categoria
+        name
+      }
       coverImage {
         url
       }
       technicalSpecs {
-        key
-        value
+        raw
       }
-      affiliateLinks {
+      affiliateLink {
         name
         url
       }
-      longDescription
+      longDescription {
+        raw
+      }
     }
     productsConnection(
-        where: {
-            AND: [
-                { category_contains: $category }
-                { OR: [
-                    { name_contains: $searchTerm },
-                    { description_contains: $searchTerm },
-                    { longDescription_contains: $searchTerm }
-                ]}
-            ]
-        }
+        where: $where # Usa a variável $where diretamente para a conexão também
     ) {
         aggregate {
             count
@@ -101,42 +89,45 @@ const GET_PRODUCTS_QUERY = gql`
   }
 `;
 
-// Query para buscar um único produto por ID
+// Query para buscar um único produto por ID (esta não precisa de filtro de categoria dinâmico)
 const GET_PRODUCT_BY_ID_QUERY = gql`
   query GetProductById($id: ID!) {
     product(where: { id: $id }) {
       id
       name
-      price
       imageUrl {
         url
       }
       description
-      category
+      category { # Busca o subcampo 'name' da categoria
+        name
+      }
       coverImage {
         url
       }
       technicalSpecs {
-        key
-        value
+        raw
       }
-      affiliateLinks {
+      affiliateLink {
         name
         url
       }
-      longDescription
+      longDescription {
+        raw
+      }
     }
   }
 `;
 
-// Query para buscar todas as categorias (para os botões de filtro)
-// Isso assume que você tem um campo 'category' nos seus produtos ou um modelo 'Category'
+// Query para buscar todas as categorias
 const GET_CATEGORIES_QUERY = gql`
   query GetCategories {
     productsConnection {
       edges {
         node {
-          category
+          category { # Busca o subcampo 'name' da categoria
+            name
+          }
         }
       }
     }
@@ -148,21 +139,26 @@ const GET_CATEGORIES_QUERY = gql`
 interface GetProductsOptions {
   page?: number;
   limit?: number;
-  category?: string;
+  category?: string; // O filtro de categoria ainda é uma string (o nome da categoria)
   searchTerm?: string;
 }
 
 interface HygraphProduct {
     id: string;
     name: string;
-    price: number;
     imageUrl: { url: string };
-    description: string;
-    category: string;
+    description: string
+    category: {
+      name: string
+    };
     coverImage?: { url: string };
-    technicalSpecs?: { key: string; value: string }[];
+    technicalSpecs?: {
+      raw: RichTextContent
+    };
     affiliateLinks?: { name: string; url: string }[];
-    longDescription?: string;
+    longDescription?: {
+      raw: RichTextContent
+    };
 }
 
 interface HygraphResponse {
@@ -176,27 +172,15 @@ interface HygraphResponse {
 
 // Função para mapear o formato do Hygraph para a nossa interface Product
 const mapHygraphProductToProduct = (hygraphProduct: HygraphProduct): Product => {
-    // Certifique-se de que os campos do Hygraph (como `imageUrl.url`) correspondem ao seu schema
-    // Se `technicalSpecs` e `affiliateLinks` forem de um tipo `JSON` ou `Rich Text` no Hygraph,
-    // você precisará de uma lógica de parse mais robusta aqui.
-    // Assumimos aqui que technicalSpecs é uma lista de objetos {key: string, value: string}
-    // e affiliateLinks é uma lista de objetos {name: string, url: string}
-    const technicalSpecsMap: { [key: string]: string } = {};
-    if (hygraphProduct.technicalSpecs) {
-        hygraphProduct.technicalSpecs.forEach(spec => {
-            technicalSpecsMap[spec.key] = spec.value;
-        });
-    }
-
     return {
         id: hygraphProduct.id,
         name: hygraphProduct.name,
-        price: hygraphProduct.price,
         imageUrl: hygraphProduct.imageUrl?.url,
         description: hygraphProduct.description,
-        category: hygraphProduct.category,
+        // Mapeia o objeto de categoria para apenas o nome, como esperado pela interface Product
+        category: { name: hygraphProduct.category.name },
         coverImage: hygraphProduct.coverImage?.url,
-        technicalSpecs: technicalSpecsMap,
+        technicalSpecs: hygraphProduct.technicalSpecs,
         affiliateLinks: hygraphProduct.affiliateLinks,
         longDescription: hygraphProduct.longDescription,
     };
@@ -209,12 +193,42 @@ export async function getProductsFromHygraph({ page = 1, limit = 12, category, s
 
   const skip = (page - 1) * limit;
 
+  // Array para armazenar as condições de filtro
+  const conditions: any[] = [];
+
+  // 1. Adicionar filtros de termo de busca APENAS SE searchTerm existir
+  const searchTermConditions: any[] = [];
+  if (searchTerm) {
+    searchTermConditions.push({ name_contains: searchTerm });
+    searchTermConditions.push({ description_contains: searchTerm });
+    searchTermConditions.push({ longDescription_contains: searchTerm });
+  }
+
+  // Se houver condições de searchTerm, adicione-as ao array principal como um OR
+  if (searchTermConditions.length > 0) {
+    conditions.push({ OR: searchTermConditions });
+  }
+
+  // 2. Adicionar filtro de categoria APENAS SE category for fornecido e diferente de "Todas"
+  if (category && category !== "Todas") {
+    conditions.push({ category: { name_contains: category } });
+  }
+
+  // Crie o objeto 'where' final
+  // Se houver múltiplas condições, elas serão combinadas com AND implicitamente no Hygraph
+  // Se não houver condições, o objeto 'where' pode ser vazio ou nulo (que busca tudo)
+  const whereConditions = conditions.length > 0 ? { AND: conditions } : {};
+
+  // Se não houver nenhum filtro (nem searchTerm, nem category), o objeto whereConditions será `{}` (vazio),
+  // o que fará com que a query retorne todos os produtos. Se `conditions` estiver vazio,
+  // e você quiser um `{}` literal para o `where` na query, é só passar `whereConditions` como está.
+
+
   // Variáveis para a query
   const variables = {
     first: limit,
     skip,
-    category: category && category !== "Todas" ? category : undefined,
-    searchTerm: searchTerm ? searchTerm : undefined,
+    where: whereConditions // Passamos o objeto 'where' construído dinamicamente
   };
 
   try {
@@ -250,11 +264,11 @@ export async function getCategoriesFromHygraph(): Promise<string[]> {
   }
 
   try {
-    const data = await graphQLClient.request<{ productsConnection: { edges: { node: { category: string } }[] } }>(GET_CATEGORIES_QUERY);
+    const data = await graphQLClient.request<{ productsConnection: { edges: { node: { category: { name: string } } }[] } }>(GET_CATEGORIES_QUERY);
     const uniqueCategories = new Set<string>();
     data.productsConnection.edges.forEach(edge => {
-        if (edge.node.category) {
-            uniqueCategories.add(edge.node.category);
+        if (edge.node.category && edge.node.category.name) {
+            uniqueCategories.add(edge.node.category.name);
         }
     });
     return ["Todas", ...Array.from(uniqueCategories)];

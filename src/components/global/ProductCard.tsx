@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/lib/api-mock"; // Importe a interface do produto
+import { Product } from "@/@types"; // Importe a interface do produto
 import Link from "next/link";
 
 interface ProductCardProps {
@@ -27,9 +27,6 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardTitle>
         <p className="text-gray-600 text-sm mt-1 line-clamp-2">
           {product.description}
-        </p>
-        <p className="text-xl font-bold text-primary mt-2">
-          R$ {product.price.toFixed(2).replace('.', ',')}
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">

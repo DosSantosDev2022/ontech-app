@@ -132,7 +132,8 @@ export default function HomePage() {
       </div>
     );
   }
-
+  console.log('categorias:' , categories)
+  console.log('produtos', products)
   return (
     <div className="flex min-h-screen flex-col">
       <main className="container mx-auto px-4 py-8 flex-grow">
