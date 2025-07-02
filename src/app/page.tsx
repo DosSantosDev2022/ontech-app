@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RocketIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Header } from "@/components/layout/Header"; // Certifique-se de importar o Header
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Todas");
@@ -23,13 +22,15 @@ export default function HomePage() {
   const { data: categoriesData, isLoading: isLoadingCategories, isError: isErrorCategories } = useQuery<string[], Error>({
     queryKey: ["categories"],
     queryFn: getCategoriesFromHygraph,
-    staleTime: Infinity, // Categorias raramente mudam, então podem ser cacheadas indefinidamente
+    staleTime: 1000 * 60 * 60 * 7, 
     placeholderData: ["Todas"] // Mostra "Todas" enquanto carrega
   });
 
   // Garante que 'categories' nunca seja undefined
   const categories = categoriesData || ["Todas"];
-
+   useEffect(() => {
+    console.log("Dados de categorias recebidos:", categoriesData);
+  }, [categoriesData]);
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -64,7 +65,7 @@ export default function HomePage() {
       return undefined;
     },
     initialPageParam: 1,
-    staleTime: 1000 * 60 * 1, // 1 minuto de cache
+    staleTime: 1000 * 60 * 1, // 5 minuto de cache
     // placeholderData para manter dados anteriores enquanto carrega nova query
     // Útil para evitar o "pop" de conteúdo ao mudar filtros
     placeholderData: (previousData) => previousData,
@@ -132,8 +133,7 @@ export default function HomePage() {
       </div>
     );
   }
-  console.log('categorias:' , categories)
-  console.log('produtos', products)
+ 
   return (
     <div className="flex min-h-screen flex-col">
       <main className="container mx-auto px-4 py-8 flex-grow">
@@ -143,7 +143,19 @@ export default function HomePage() {
         <div className="mb-8 p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Filtrar Produtos</h2>
 
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between w-full gap-4">
+          <div className="flex flex-col  w-full gap-4">
+            
+            {/* Filtro por Busca */}
+            <div className="w-full">
+              <p className="text-sm font-medium mb-2">Buscar produtos:</p>
+              <Input
+                type="text"
+                placeholder="Buscar por nome ou descrição..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full "
+              />
+            </div>
             {/* Filtro por Categoria */}
             <div className="flex-grow">
               <p className="text-sm font-medium mb-2">Por Categoria:</p>
@@ -161,17 +173,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Filtro por Busca */}
-            <div className="md:flex-shrink-0">
-              <p className="text-sm font-medium mb-2">Busca Específica:</p>
-              <Input
-                type="text"
-                placeholder="Buscar por nome ou descrição..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full md:max-w-md"
-              />
-            </div>
           </div>
         </div>
 

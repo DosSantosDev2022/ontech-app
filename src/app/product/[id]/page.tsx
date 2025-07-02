@@ -1,7 +1,6 @@
 "use client"; // Marca como Client Component
 
 import { getProductByIdFromHygraph } from "@/lib/hygraph"; // Importa a nova função do Hygraph
-import { Product } from "@/lib/api-mock"; // Continua importando a interface Product
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -12,6 +11,9 @@ import { RocketIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Product } from "@/@types";
+import { RichText } from "@/components/global/richText";
+import { defaultRenders } from "@/components/global/richTextRenders";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -28,7 +30,7 @@ export default function ProductDetailPage() {
     enabled: !!productId, // A query só roda se o productId existir
     staleTime: 1000 * 60 * 5, // Cache por 5 minutos
   });
-
+  console.log('dadosId:', product)
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
@@ -41,7 +43,6 @@ export default function ProductDetailPage() {
   if (isError) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Header />
         <Alert variant="destructive" className="mt-8">
           <RocketIcon className="h-4 w-4" />
           <AlertTitle>Erro ao carregar produto</AlertTitle>
@@ -56,7 +57,6 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <Header /> {/* Adicionado o Header aqui também para consistência */}
         <Alert variant="default" className="mt-8">
           <AlertTitle>Produto não encontrado</AlertTitle>
           <AlertDescription>
@@ -72,7 +72,6 @@ export default function ProductDetailPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header /> {/* Adicione o Header */}
       <main className="container mx-auto px-4 py-8 flex-grow">
         <Button asChild variant="outline" className="mb-6">
           <Link href="/">← Voltar para os Produtos</Link>
@@ -93,19 +92,15 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Ficha Técnica */}
-            {product.technicalSpecs && Object.keys(product.technicalSpecs).length > 0 && (
-              <div className="p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
-                <h2 className="text-2xl font-semibold mb-3">Ficha Técnica</h2>
-                <ul className="grid grid-cols-1 gap-y-2 text-gray-800">
-                  {Object.entries(product.technicalSpecs).map(([key, value]) => (
-                    <li key={key} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-1">
-                      <span className="font-medium text-gray-600">{key}:</span>
-                      <span className="text-right sm:text-left">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div>
+              <h2 className="font-bold text-lg md:text-2xl">Ficha Técnica </h2>
+              {product.technicalSpecs &&  (
+                <RichText
+                  content={product.technicalSpecs.raw}
+                  renderers={defaultRenders}
+                />
             )}
+            </div>
           </div>
 
           {/* Coluna da Direita: Detalhes do Produto e Links de Afiliados */}
@@ -113,11 +108,8 @@ export default function ProductDetailPage() {
             <h1 className="text-4xl font-extrabold text-primary-foreground mb-2">
               {product.name}
             </h1>
-            <p className="text-3xl font-bold text-primary">
-              R$ {product.price.toFixed(2).replace('.', ',')}
-            </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              {product.longDescription || product.description}
+              {product.description}
             </p>
 
             <Separator className="my-2" />
@@ -130,7 +122,7 @@ export default function ProductDetailPage() {
                   {product.affiliateLinks.map((link, index) => (
                     <Button key={index} asChild size="lg" className="w-full">
                       <a href={link.url} target="_blank" rel="noopener noreferrer">
-                        Comprar na {link.name}
+                        Comprar no(a) {link.name}
                       </a>
                     </Button>
                   ))}
