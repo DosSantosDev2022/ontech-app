@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { ReactNode } from 'react'
 
 interface defaultRendersProps {
@@ -36,7 +37,10 @@ const defaultRenders = {
 		<p className='font-light text-base lg:text-lg mt-4'>{children}</p>
 	),
 	a: ({ children, href }: defaultRendersLinkProps) => (
-		<a href={href} className='text-blue-400 cursor-pointer hover:underline'>
+		<a
+			href={href}
+			className='text-blue-400 cursor-pointer hover:underline'
+		>
 			{children}
 		</a>
 	),
@@ -55,8 +59,8 @@ const defaultRenders = {
 	),
 	img: ({ src, altText, width, height }: ImageRenderProps) => (
 		<div className='my-6 flex justify-center'>
-			<img
-				src={src}
+			<Image
+				src={src || ''}
 				alt={altText ?? ''}
 				width={width}
 				height={height}
