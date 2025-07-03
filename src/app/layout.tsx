@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/providers/QueryProvider' // Importe o provedor
 import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -59,6 +60,7 @@ export default function RootLayout({
 				<QueryProvider>
 					<Header />
 					{children}
+          <Footer />
 				</QueryProvider>
 			</body>
 		</html>
