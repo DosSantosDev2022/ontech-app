@@ -10,7 +10,6 @@
 		"lint": "npx @biomejs/biome lint  ./src",
 		"lint-fix": "npx @biomejs/biome lint --fix ./src",
 		"check": "npx @biomejs/biome check ./src",
-		"prepare": "husky",
 		"test": "vitest"
 	},
 	"dependencies": {
