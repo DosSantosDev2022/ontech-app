@@ -29,7 +29,7 @@ export default function ProductDetailPage() {
 		enabled: !!productId, // A query só roda se o productId existir
 		staleTime: 1000 * 60 * 5, // Cache por 5 minutos
 	})
-	console.log('dadosId:', product)
+
 	if (isLoading) {
 		return (
 			<div className='flex min-h-screen items-center justify-center bg-background text-foreground'>
