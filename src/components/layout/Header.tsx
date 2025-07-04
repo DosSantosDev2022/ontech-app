@@ -16,9 +16,9 @@ export function Header() {
 				<nav className='hidden md:flex space-x-4'>
 					<CouponsDialog />
 					
-					<Button variant='ghost'>Categorias</Button>
+					{/* <Button variant='ghost'>Categorias</Button>
 					<Button variant='ghost'>Contato</Button>
-					<Button variant='ghost'>Minha Conta</Button>
+					<Button variant='ghost'>Minha Conta</Button> */}
 				</nav>
 
 				{/* Menu Mobile */}
@@ -32,10 +32,8 @@ export function Header() {
 						</SheetTrigger>
 						<SheetContent side='left'>
 							<nav className='flex flex-col gap-4 pt-6'>
-								<Button variant='ghost' className='justify-start'>
-									Produtos
-								</Button>
-								<Button variant='ghost' className='justify-start'>
+								<CouponsDialog />
+								{/* <Button variant='ghost' className='justify-start'>
 									Categorias
 								</Button>
 								<Button variant='ghost' className='justify-start'>
@@ -43,7 +41,7 @@ export function Header() {
 								</Button>
 								<Button variant='ghost' className='justify-start'>
 									Minha Conta
-								</Button>
+								</Button> */}
 							</nav>
 						</SheetContent>
 					</Sheet>
