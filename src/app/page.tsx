@@ -158,12 +158,24 @@ export default function HomePage() {
         {/* Seção de Filtros */}
         <div className='mb-8 p-4 border rounded-lg bg-card text-card-foreground shadow-sm'>
           <h2 className='text-xl font-semibold mb-4'>Filtrar Produtos</h2>
-
-          {/* Alterações aqui para responsividade dos filtros */}
+          
+           {/* Filtro por Busca */}
+            <div className='w-full mb-2'> {/* Ocupa a largura total disponível */}
+              <p className='text-sm font-medium mb-2'>Buscar produtos:</p>
+              <Input
+                type='text'
+                placeholder='Buscar por nome ou descrição...'
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className='w-full'
+              />
+            </div>
           <div className='flex flex-col sm:flex-row w-full gap-4'>
             {/* Filtro por Categoria */}
             <div className='w-full sm:w-auto flex-shrink-0'> {/* Adicionado flex-shrink-0 */}
-              <p className='text-sm font-medium mb-2'>Por Categoria:</p>
+              <div>
+                <p className='text-sm font-medium mb-2'>Por Categoria:</p>
+              </div>
               <div className='flex gap-2 overflow-x-auto pb-2 scrollbar-hide'> {/* overflow-x-auto e scrollbar-hide */}
                 {categories.map((cat) => (
                   <Button
@@ -180,17 +192,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Filtro por Busca */}
-            <div className='w-full'> {/* Ocupa a largura total disponível */}
-              <p className='text-sm font-medium mb-2'>Buscar produtos:</p>
-              <Input
-                type='text'
-                placeholder='Buscar por nome ou descrição...'
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className='w-full'
-              />
-            </div>
+           
           </div>
         </div>
 
