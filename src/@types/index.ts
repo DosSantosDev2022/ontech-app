@@ -16,6 +16,9 @@ export interface Product {
 	affiliateLinks?: {
 		name: string // Nome da loja (ex: "Amazon", "Magazine Luiza")
 		url: string // URL do link de afiliado
+		icon?: {
+			url: string
+		}
 	}[]
 	longDescription?: {
 		raw: RichTextContent

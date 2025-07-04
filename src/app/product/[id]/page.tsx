@@ -124,6 +124,7 @@ export default function ProductDetailPage() {
 									</h2>
 									<div className='flex flex-col gap-3'>
 										{product.affiliateLinks.map((link) => (
+											<>
 											<Button
 												key={link.name}
 												asChild
@@ -134,10 +135,21 @@ export default function ProductDetailPage() {
 													href={link.url}
 													target='_blank'
 													rel='noopener noreferrer'
+													className='flex items-center justify-center gap-2' 
 												>
-													Comprar no(a) {link.name}
+													Comprar no {link.name}
+													{link.icon?.url && ( 
+														<Image 
+															width={24}
+															height={24} 
+															alt={link.name} 
+															src={link.icon.url} 
+														/>
+													)}
+													
 												</a>
 											</Button>
+										</>
 										))}
 									</div>
 								</div>

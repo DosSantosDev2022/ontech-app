@@ -18,7 +18,10 @@ export interface Product {
   affiliateLinks?: {
     name: string
     url: string
-  }[]
+    icon: {
+      url: string
+    }
+  } []
   longDescription?: {
     raw: RichTextContent
   }
@@ -71,6 +74,10 @@ const GET_PRODUCTS_QUERY = gql`
       }
       affiliateLinks {
         name
+        url
+        icon {
+          url
+        }
       }
       longDescription {
         raw
@@ -106,6 +113,10 @@ const GET_PRODUCT_BY_ID_QUERY = gql`
       }
       affiliateLinks {
         name
+        url
+        icon {
+          url
+        }
       }
       longDescription {
         raw
@@ -155,7 +166,7 @@ interface HygraphProduct {
   technicalSpecs?: {
     raw: RichTextContent
   }
-  affiliateLinks?: { name: string; url: string }[]
+  affiliateLinks?: { name: string; url: string, icon: { url: string} }[]
   longDescription?: {
     raw: RichTextContent
   }
