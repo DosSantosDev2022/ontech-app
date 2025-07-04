@@ -127,7 +127,7 @@
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-	background-color: var(--muted);
+	background-color: var(--primary);
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
@@ -141,10 +141,10 @@
 }
 
 .dark .scrollbar-custom::-webkit-scrollbar-track {
-	background-color: var(--color-muted); /* Cor de fundo escura */
+	background-color: var(--color-primary-foreground); /* Cor de fundo escura */
 }
 
 .dark .scrollbar-custom::-webkit-scrollbar-thumb {
-	background-color: var(--muted-foreground); /* Cor do polegar clara */
+	background-color: var(--color-primary); /* Cor do polegar clara */
 	border-radius: 6px;
 }

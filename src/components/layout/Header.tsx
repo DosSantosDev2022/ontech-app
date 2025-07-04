@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu } from 'lucide-react' // Um ícone simples para o menu mobile
+import { CouponsDialog } from '@/components/global'
 
 export function Header() {
 	return (
@@ -13,7 +14,8 @@ export function Header() {
 
 				{/* Navegação Principal (Desktop) */}
 				<nav className='hidden md:flex space-x-4'>
-					<Button variant='ghost'>Produtos</Button>
+					<CouponsDialog />
+					
 					<Button variant='ghost'>Categorias</Button>
 					<Button variant='ghost'>Contato</Button>
 					<Button variant='ghost'>Minha Conta</Button>
