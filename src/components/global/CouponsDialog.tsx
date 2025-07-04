@@ -13,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertCircleIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getCouponsFromHygraph, Coupon } from '@/lib/hygraph'; 
+import { parseDateString } from '@/utils/formatDate';
 
 interface CouponItemProps {
   couponCode: string;
@@ -27,7 +28,7 @@ const CouponItem = ({ couponCode, expirationDate,label }: CouponItemProps) => {
   const [alertVariant, setAlertVariant] = useState<'default' | 'destructive'>('default');
 
   // Converte a string da data de expiração para um objeto Date
-  const expiresOn = new Date(expirationDate);
+  const expiresOn = parseDateString(expirationDate);
   const currentDate = new Date(); // Current date and time in Jundiaí, Brazil: Friday, July 4, 2025 at 11:45:26 AM -03
 
   // Verifica se o cupom expirou
