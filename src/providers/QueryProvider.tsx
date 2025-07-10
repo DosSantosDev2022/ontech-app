@@ -7,7 +7,7 @@ import React from 'react'
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
-			staleTime: 1000 * 60 * 5, // Dados "frescos" por 5 minutos antes de serem considerados "stale"
+			staleTime: 1000 * 60 * 60 * 7, // Dados "frescos" por 7 horas antes de serem considerados "stale"
 			refetchOnWindowFocus: false, // Evita refetch em cada foco de janela para dados que não precisam de atualização em tempo real
 		},
 	},

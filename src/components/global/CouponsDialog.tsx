@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -121,6 +122,10 @@ const CouponsDialog = () => {
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Meus cupons</DialogTitle>
+          <DialogDescription>
+            Coloque o código do cupom na barra de busca do Mercado livre
+            para buscar produtos válidos.
+          </DialogDescription>
         </DialogHeader>
         <div className='py-4 max-h-72 overflow-x-auto scrollbar-custom'>
           {isLoading && (

@@ -79,7 +79,7 @@ export default function HomePage() {
       return undefined
     },
     initialPageParam: 1,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 60 * 7,
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: true,
     refetchIntervalInBackground: false,

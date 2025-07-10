@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
 		queryKey: ['product', productId],
 		queryFn: () => getProductByIdFromHygraph(productId),
 		enabled: !!productId, // A query só roda se o productId existir
-		staleTime: 1000 * 60 * 5, // Cache por 5 minutos
+		staleTime: 1000 * 60 * 60 * 7, // Cache por 7hr
 	})
 
 	if (isLoading) {
